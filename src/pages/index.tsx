@@ -1,10 +1,35 @@
+
 import Head from 'next/head'
 import { Inter } from 'next/font/google'
 import HomeStyles from '@/styles/Home.module.css'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import useIsHydrated from '@/hooks/useIsHydrated';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const [input, setInput] = useState('')
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
+  const {isSsrHydrated} = useIsHydrated()
+
+  useEffect(() => {
+    onInputChange(transcript)
+  }, [transcript])
+
+  function onInputChange (text) {
+    setInput(text)
+  }
+
+  if (isSsrHydrated && !browserSupportsSpeechRecognition) {
+    return <span>Your browser doesn't support speech recognition.</span>;
+  }
+
   return (
     <>
       <Head>
@@ -14,7 +39,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${HomeStyles.main} ${inter.className}`}>
-        Test
+        <div>
+          <p>Microphone: {listening ? 'on' : 'off'}</p>
+          <button onClick={SpeechRecognition.startListening}>Start</button>
+          <button onClick={SpeechRecognition.stopListening}>Stop</button>
+          <button onClick={resetTranscript}>Reset</button>
+          <input value={input} onChange={(e) => onInputChange(e.target.value)}></input>
+        </div>
       </main>
     </>
   )
