@@ -1,35 +1,16 @@
 
 import Head from 'next/head'
 import { Inter } from 'next/font/google'
-import HomeStyles from '@/styles/Home.module.css'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import useIsHydrated from '@/hooks/useIsHydrated';
-import { useEffect, useState } from 'react';
+import HomeStyles from '@/styles/home.module.scss'
+import Input from '@/components/Input'
+import Translation from '@/components/Translation'
+import { useState } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
-  const [input, setInput] = useState('')
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition
-  } = useSpeechRecognition();
-  const {isSsrHydrated} = useIsHydrated()
-
-  useEffect(() => {
-    onInputChange(transcript)
-  }, [transcript])
-
-  function onInputChange (text) {
-    setInput(text)
-  }
-
-  if (isSsrHydrated && !browserSupportsSpeechRecognition) {
-    return <span>Your browser doesn't support speech recognition.</span>;
-  }
-
+  const [input, setInput] = useState<string>('')
+  const [translatedText, setTranslatedText] = useState<string>('')
   return (
     <>
       <Head>
@@ -38,14 +19,11 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${HomeStyles.main} ${inter.className}`}>
-        <div>
-          <p>Microphone: {listening ? 'on' : 'off'}</p>
-          <button onClick={SpeechRecognition.startListening}>Start</button>
-          <button onClick={SpeechRecognition.stopListening}>Stop</button>
-          <button onClick={resetTranscript}>Reset</button>
-          <input value={input} onChange={(e) => onInputChange(e.target.value)}></input>
-        </div>
+      <main className={`${HomeStyles.homeContainer} ${inter.className}`}>
+        <h1>Translate from English to Japanese <br/> With AI!</h1>
+        <Input input={input} setInput={setInput} setTranslatedText={setTranslatedText}/>
+        {translatedText[0] &&
+          <Translation translatedText={translatedText} setTranslatedText={setTranslatedText}/>}
       </main>
     </>
   )

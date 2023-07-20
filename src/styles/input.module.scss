@@ -1,0 +1,60 @@
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    & > textarea {
+        resize: none;
+        overflow: hidden;
+        line-height: 1;
+        outline: none;
+        border: 2px solid grey;
+        border-radius: 5px;
+        padding: 10px 10px;
+        color: black;
+        font-size: 20px;
+
+        &:focus {
+            border: 2px solid lightblue;
+        }
+    }
+}
+
+.buttonsSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+
+    & button {
+        // all: unset;
+        cursor: pointer;
+        border: 1px solid grey;
+        border-radius: 5px;
+        min-width: 60px;
+        min-height: 40px;
+        padding: 10px;
+        font-size: 20px;
+    }
+
+    //Для всех елементов кроме последнего
+    & button:not(:last-child) {
+        margin-right: 20px;
+    }
+    
+}
+
+.buttonStart {
+    background-color: green;
+    color: black;
+}
+
+.buttonStop {
+    background-color: red;
+    color: white;
+}
+
+.buttonTranslate {
+    background-color: rgb(87, 128, 240);
+}
