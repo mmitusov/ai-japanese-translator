@@ -1,52 +1,106 @@
-import React, { useRef } from 'react'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import useIsHydrated from '@/hooks/useIsHydrated';
-import { useEffect, useState } from 'react';
-import InputStyles from '@/styles/input.module.scss'
+import React, { useRef, useState } from 'react'
 import useAutosizeTextArea from '@/hooks/useAutosizeTextArea';
+import useIsHydrated from '@/hooks/useIsHydrated';
+import InputStyles from '@/styles/input.module.scss'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import axios from 'axios';
 
 const Input = ({input, setInput, setTranslatedText}: any) => {
-    const {
-      transcript,
-      listening,
-      resetTranscript,
-      browserSupportsSpeechRecognition
-    } = useSpeechRecognition();
-    const {isSsrHydrated} = useIsHydrated()
-    const textAreaRef = useRef<HTMLTextAreaElement>(null);
-    useAutosizeTextArea(textAreaRef.current, input)
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
+  const {isSsrHydrated} = useIsHydrated()
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  useAutosizeTextArea(textAreaRef.current, input)
   
-    useEffect(() => {
-      onInputChange(transcript)
-    }, [transcript])
+  const [recording, setRecording] = useState<any>(false);
+  const [mediaRecorder, setMediaRecorder] = useState<any>(null);
 
-    async function translateInput (textToTranslate: string) {
-      const response = await axios.post(
-        'https://translation.googleapis.com/language/translate/v2',
-        {},
-        {
-          params: {
-            key: 'AIzaSyDtj8Av-a4qeIYf5trEO_N4WCZgOsGLtII',
-            q: textToTranslate,
-            source: 'en',
-            target: 'uk', //ja, ru
-          }
+  ////'react-speech-recognition' library. For now for speech-recognition I'm using my own backend, thus I disabled it
+  // useEffect(() => {
+  //   onInputChange(transcript)
+  // }, [transcript])
+
+  //Start manual recording
+  const startRecording = async () => {
+    setRecording(true);
+    // Access user's microphone and start recording audio
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    const mediaRecorder = new MediaRecorder(stream);
+    setMediaRecorder(mediaRecorder)
+    const audioChunks: any = [];
+
+    //Will be triggerd only after we stop 'mediaRecorder.stop();'
+    mediaRecorder.ondataavailable = async (e: any) => {
+      if (e.data.size > 0) {
+        audioChunks.push(e.data);
+      }
+    };
+
+    //Will be triggerd only after we stop 'mediaRecorder.stop();'
+    mediaRecorder.onstop = async () => {
+      try {
+        ////If we want we can convert one Blob data type into another (e.g. video to audio)
+        // const audioBlob = new Blob(audioChunks, {type: audio/mpeg});
+
+        if (audioChunks.length > 0) {
+          const formData = new FormData();
+          audioChunks.forEach((chunk: any) => {
+            formData.append('file', chunk);
+          });
+
+          const response: any = await axios.post("http://localhost:3005/whisper", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          const data = await response.data.results[0].transcript;
+          setInput(data)
         }
-      )
-      const data = await response.data.data.translations[0].translatedText
-      setInput('')
-      setTranslatedText(data)
-    }
+      } catch (error) {
+        console.error('Error sending audio chunks:', error);
+      }
+    };
 
-    function onInputChange (text) {
-      setInput(text)
-    }
+    mediaRecorder.start();
+  };
+
+  //Stop manual recording
+  const stopRecording = () => {
+    mediaRecorder.stop();
+    setRecording(false);
+  }
+
+  //Translate Input text
+  async function translateInput (textToTranslate: string) {
+    const response = await axios.post(
+      'https://translation.googleapis.com/language/translate/v2',
+      {},
+      {
+        params: {
+          key: 'AIzaSyDtj8Av-a4qeIYf5trEO_N4WCZgOsGLtII',
+          q: textToTranslate,
+          source: 'en',
+          target: 'uk', //ja, ru
+        }
+      }
+    )
+    const data = await response.data.data.translations[0].translatedText
+    setInput('')
+    setTranslatedText(data)
+  }
+
+  function onInputChange (text: string) {
+    setInput(text)
+  }
+
+  if (isSsrHydrated && !browserSupportsSpeechRecognition) {
+    return <span>Your browser doesn't support speech recognition.</span>;
+  }
   
-    if (isSsrHydrated && !browserSupportsSpeechRecognition) {
-      return <span>Your browser doesn't support speech recognition.</span>;
-    }
-    
   return (
     <div className={`${InputStyles.inputContainer}`}>
         <textarea 
@@ -59,9 +113,11 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
         <div className={`${InputStyles.buttonsSection}`}>
           <div >
               {
-                  listening
-                      ? <button onClick={SpeechRecognition.stopListening} className={`${InputStyles.buttonStop}`}>Stop dictation</button>
-                      : <button onClick={SpeechRecognition.startListening} className={`${InputStyles.buttonStart}`}>Start dictation</button>
+                ////'react-speech-recognition' library. For now for speech-recognition I'm using my own backend, thus I disabled it
+                // listening
+                recording
+                    ? <button onClick={stopRecording } className={`${InputStyles.buttonStop}`}>Stop dictation</button> //SpeechRecognition.stopListening
+                    : <button onClick={startRecording} className={`${InputStyles.buttonStart}`}>Start dictation</button> //SpeechRecognition.startListening
               }
               <button onClick={resetTranscript}>Reset</button>
           </div>
