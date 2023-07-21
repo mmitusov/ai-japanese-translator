@@ -31,7 +31,17 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
     const mediaRecorder = new MediaRecorder(stream);
     setMediaRecorder(mediaRecorder)
+
+    
     const audioChunks: any = [];
+
+    // var speechEvents = hark(stream, {});
+    // speechEvents.on('speaking', function() {
+    //   console.log('Speaking!');
+    // });
+    // speechEvents.on('stopped_speaking', function() {
+    //   console.log('stopped_speaking');
+    // });
 
     //Will be triggerd only after we stop 'mediaRecorder.stop();'
     mediaRecorder.ondataavailable = async (e: any) => {
@@ -74,6 +84,10 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
     setRecording(false);
   }
 
+  const clearInputField = () => {
+    setInput('')
+  }
+
   //Translate Input text
   async function translateInput (textToTranslate: string) {
     const response = await axios.post(
@@ -89,7 +103,6 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
       }
     )
     const data = await response.data.data.translations[0].translatedText
-    setInput('')
     setTranslatedText(data)
   }
 
@@ -114,17 +127,17 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
           <div >
               {
                 ////'react-speech-recognition' library. For now for speech-recognition I'm using my own backend, thus I disabled it
-                // listening
+                //listening
                 recording
-                    ? <button onClick={stopRecording } className={`${InputStyles.buttonStop}`}>Stop dictation</button> //SpeechRecognition.stopListening
+                    ? <button onClick={stopRecording} className={`${InputStyles.buttonStop}`}>Stop dictation</button> //SpeechRecognition.stopListening
                     : <button onClick={startRecording} className={`${InputStyles.buttonStart}`}>Start dictation</button> //SpeechRecognition.startListening
               }
-              <button onClick={resetTranscript}>Reset</button>
+              <button onClick={clearInputField}>Clear</button>
           </div>
           <div>
             <button 
               className={`${InputStyles.buttonTranslate}`} 
-              disabled={listening || input.length===0}
+              disabled={recording || input.length===0} //listening
               onClick={() => translateInput(input)}
             >
               Translate
