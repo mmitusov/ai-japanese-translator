@@ -11,5 +11,39 @@
         color: black;
         font-size: 20px;
     }
+
+    & button {
+        // all: unset;
+        cursor: pointer;
+        border: 1px solid grey;
+        border-radius: 5px;
+        min-width: 60px;
+        min-height: 40px;
+        padding: 10px;
+        font-size: 20px;
+    }
+
+    & button:not(:last-child) {
+        margin-right: 20px;
+    }
 }
 
+.buttonsSection {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    & > div {
+        display: flex;
+    }
+}
+
+.buttonVoice {
+    background-color: rgb(87, 128, 240);
+    color: black;
+}
+
+.buttonCopy {
+    background-color: green;
+    color: black;
+}

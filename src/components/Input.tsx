@@ -101,8 +101,8 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
     setInput(text)
   }
 
-  if (isSsrHydrated && !browserSupportsSpeechRecognition) {
-    return <span>Your browser doesn't support speech recognition.</span>;
+  if (!isSsrHydrated) {
+    return <span>Loading...</span>;
   }
   
   return (
@@ -114,16 +114,23 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
             rows={1}
             onChange={(e) => onInputChange(e.target.value)}
         />
+        {!browserSupportsSpeechRecognition && <p>Your browser doesn't support speech recognition.</p>}
+
         <div className={`${InputStyles.buttonsSection}`}>
-          <div >
-              {
-                ////'react-speech-recognition' library. For now for speech-recognition I'm using my own backend, thus I disabled it
-                //listening
-                recording
-                    ? <button onClick={stopRecording} className={`${InputStyles.buttonStop}`}>Stop dictation</button> //SpeechRecognition.stopListening
-                    : <button onClick={startRecording} className={`${InputStyles.buttonStart}`}>Start dictation</button> //SpeechRecognition.startListening
-              }
-              <button onClick={clearInputField}>Clear</button>
+          <div>
+            {
+              ////'react-speech-recognition' library. For now for speech-recognition I'm using my own backend, thus I disabled it
+              //'listening' instead of 'recording' 
+              browserSupportsSpeechRecognition && (
+                <button
+                  onClick={recording ? stopRecording : startRecording} //SpeechRecognition.stopListening || SpeechRecognition.startListening
+                  className={`${recording ? InputStyles.buttonStop : InputStyles.buttonStart}`}
+                >
+                  {recording ? "Stop dictation" : "Start dictation"}
+                </button>
+              )
+            }
+            <button onClick={clearInputField}>Clear</button>
           </div>
           <div>
             <button 

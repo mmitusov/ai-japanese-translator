@@ -33,7 +33,6 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
     document.body.removeChild(anchorElement);
     window.URL.revokeObjectURL(href);
   }
-  // speak('平素より弊社アプリをご利用いただき誠にありがとうございます！')
   
   return (
     <div className={`${TranslationStyles.translationContainer}`}>
@@ -41,6 +40,19 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
         <p>
             {translatedText}
         </p>
+
+        <div className={`${TranslationStyles.buttonsSection}`}>
+          <div>
+            <button onClick={() => {navigator.clipboard.writeText(translatedText)}} className={`${TranslationStyles.buttonCopy}`}>Copy text</button>
+            <button onClick={() => setTranslatedText('')}>Clear</button>
+          </div>
+          <button 
+            onClick={() => speak(translatedText)}
+            className={`${TranslationStyles.buttonVoice}`}
+          >
+            Play voice
+          </button>
+        </div>
     </div>
   )
 }
