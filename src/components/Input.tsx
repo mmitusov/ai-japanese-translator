@@ -32,16 +32,7 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
     const mediaRecorder = new MediaRecorder(stream);
     setMediaRecorder(mediaRecorder)
 
-    
     const audioChunks: any = [];
-
-    // var speechEvents = hark(stream, {});
-    // speechEvents.on('speaking', function() {
-    //   console.log('Speaking!');
-    // });
-    // speechEvents.on('stopped_speaking', function() {
-    //   console.log('stopped_speaking');
-    // });
 
     //Will be triggerd only after we stop 'mediaRecorder.stop();'
     mediaRecorder.ondataavailable = async (e: any) => {
@@ -97,8 +88,8 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
         params: {
           key: 'AIzaSyDtj8Av-a4qeIYf5trEO_N4WCZgOsGLtII',
           q: textToTranslate,
-          source: 'en',
-          target: 'uk', //ja, ru
+          source: 'en', //Если убрать параметр 'source', то язык будет определяться автоматически
+          target: 'ja', //ja (япон), uk (укр), ru (рус)
         }
       }
     )
