@@ -20,7 +20,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={`${HomeStyles.homeContainer} ${inter.className}`}>
-        <h1>Translate from English to Japanese <br/> With AI!</h1>
+        <h1>Translate from ANY language to Japanese <br/> With AI!</h1>
         <Input input={input} setInput={setInput} setTranslatedText={setTranslatedText}/>
         {translatedText[0] &&
           <Translation translatedText={translatedText} setTranslatedText={setTranslatedText}/>}

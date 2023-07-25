@@ -13,6 +13,7 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
     browserSupportsSpeechRecognition
   } = useSpeechRecognition();
   const {isSsrHydrated} = useIsHydrated()
+  const [isAudioUploaded, setIsAudioUploaded] = useState<Boolean>(true)
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useAutosizeTextArea(textAreaRef.current, input)
   
@@ -58,8 +59,10 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
               "Content-Type": "multipart/form-data",
             },
           });
-          const data = await response.data.results[0].transcript;
-          setInput(data)
+          const data = await response.data.results[0].transcript.trimStart();
+
+          setInput((prev: string) => (prev + data))
+          setIsAudioUploaded(true)
         }
       } catch (error) {
         console.error('Error sending audio chunks:', error);
@@ -73,6 +76,7 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
   const stopRecording = () => {
     mediaRecorder.stop();
     setRecording(false);
+    setIsAudioUploaded(false)
   }
 
   const clearInputField = () => {
@@ -88,7 +92,7 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
         params: {
           key: 'AIzaSyDtj8Av-a4qeIYf5trEO_N4WCZgOsGLtII',
           q: textToTranslate,
-          source: 'en', //Если убрать параметр 'source', то язык будет определяться автоматически
+          // source: 'en', //Если убрать параметр 'source', то язык будет определяться автоматически
           target: 'ja', //ja (япон), uk (укр), ru (рус)
         }
       }
@@ -121,7 +125,7 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
             {
               ////'react-speech-recognition' library. For now for speech-recognition I'm using my own backend, thus I disabled it
               //'listening' instead of 'recording' 
-              browserSupportsSpeechRecognition && (
+              browserSupportsSpeechRecognition && isAudioUploaded && (
                 <button
                   onClick={recording ? stopRecording : startRecording} //SpeechRecognition.stopListening || SpeechRecognition.startListening
                   className={`${recording ? InputStyles.buttonStop : InputStyles.buttonStart}`}
@@ -129,9 +133,16 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
                   {recording ? "Stop dictation" : "Start dictation"}
                 </button>
               )
+              ||
+              browserSupportsSpeechRecognition && !isAudioUploaded && (
+                <button className={`${InputStyles.loaderButton}`}>
+                  <span className={`${InputStyles.loader}`}/>
+                </button>
+              )
             }
             <button onClick={clearInputField}>Clear</button>
           </div>
+
           <div>
             <button 
               className={`${InputStyles.buttonTranslate}`} 

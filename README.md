@@ -7,3 +7,8 @@ AI Audio Conversations Using OpenAI Whisper - https://medium.com/@david.richards
 
 POST /audio_query - берем от сюда параметры и передаем в /synthesis
 POST /synthesis
+
+NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+https://arrangeactassert.com/posts/how-to-fix-the-request-is-not-allowed-by-the-user-agent-or-the-platform-in-the-current-context-possibly-because-the-user-denied-permission/
+
+const data = await response.data.results[0].transcript.trimStart();
