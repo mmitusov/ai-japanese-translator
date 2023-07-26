@@ -12,3 +12,7 @@ NotAllowedError: The request is not allowed by the user agent or the platform in
 https://arrangeactassert.com/posts/how-to-fix-the-request-is-not-allowed-by-the-user-agent-or-the-platform-in-the-current-context-possibly-because-the-user-denied-permission/
 
 const data = await response.data.results[0].transcript.trimStart();
+
+
+If we want we can convert one Blob data type into another (e.g. video to audio)
+const audioBlob = new Blob(audioChunks, {type: audio/mpeg});

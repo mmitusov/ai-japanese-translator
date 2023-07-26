@@ -3,22 +3,22 @@ import useAutosizeTextArea from '@/hooks/useAutosizeTextArea';
 import useIsHydrated from '@/hooks/useIsHydrated';
 import InputStyles from '@/styles/input.module.scss'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import axios from 'axios';
+import { translateAPI } from '@/api/translateAPI';
+import { speechToTextAPI } from '@/api/speechToTextAPI';
 
 const Input = ({input, setInput, setTranslatedText}: any) => {
   const {
-    transcript,
-    listening,
-    resetTranscript,
+    // transcript,
+    // listening,
+    // resetTranscript,
     browserSupportsSpeechRecognition
   } = useSpeechRecognition();
   const {isSsrHydrated} = useIsHydrated()
-  const [isAudioUploaded, setIsAudioUploaded] = useState<Boolean>(true)
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   useAutosizeTextArea(textAreaRef.current, input)
-  
   const [recording, setRecording] = useState<any>(false);
   const [mediaRecorder, setMediaRecorder] = useState<any>(null);
+  const [isAudioUploaded, setIsAudioUploaded] = useState<Boolean>(true)
 
   ////'react-speech-recognition' library. For now for speech-recognition I'm using my own backend, thus I disabled it
   // useEffect(() => {
@@ -32,7 +32,6 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
     const mediaRecorder = new MediaRecorder(stream);
     setMediaRecorder(mediaRecorder)
-
     const audioChunks: any = [];
 
     //Will be triggerd only after we stop 'mediaRecorder.stop();'
@@ -45,21 +44,12 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
     //Will be triggerd only after we stop 'mediaRecorder.stop();'
     mediaRecorder.onstop = async () => {
       try {
-        ////If we want we can convert one Blob data type into another (e.g. video to audio)
-        // const audioBlob = new Blob(audioChunks, {type: audio/mpeg});
-
         if (audioChunks.length > 0) {
           const formData = new FormData();
           audioChunks.forEach((chunk: any) => {
             formData.append('file', chunk);
           });
-
-          const response: any = await axios.post("http://localhost:3005/whisper", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          const data = await response.data.results[0].transcript.trimStart();
+          const data = await speechToTextAPI(formData)
 
           setInput((prev: string) => (prev + data))
           setIsAudioUploaded(true)
@@ -68,7 +58,6 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
         console.error('Error sending audio chunks:', error);
       }
     };
-
     mediaRecorder.start();
   };
 
@@ -85,19 +74,7 @@ const Input = ({input, setInput, setTranslatedText}: any) => {
 
   //Translate Input text
   async function translateInput (textToTranslate: string) {
-    const response = await axios.post(
-      'https://translation.googleapis.com/language/translate/v2',
-      {},
-      {
-        params: {
-          key: 'AIzaSyDtj8Av-a4qeIYf5trEO_N4WCZgOsGLtII',
-          q: textToTranslate,
-          // source: 'en', //Если убрать параметр 'source', то язык будет определяться автоматически
-          target: 'ja', //ja (япон), uk (укр), ru (рус)
-        }
-      }
-    )
-    const data = await response.data.data.translations[0].translatedText
+    const data = await translateAPI(textToTranslate)
     setTranslatedText(data)
   }
 

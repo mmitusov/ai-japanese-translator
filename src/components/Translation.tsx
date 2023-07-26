@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import TranslationStyles from '@/styles/translation.module.scss'
-import axios from 'axios';
+import { textToSpeechAudio, textToSpeechParams } from '@/api/textToSpeechAPI';
 
 let audio: any;
 
@@ -8,15 +8,17 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
   const [audioFile, setAudioFile] = useState<Blob | null>(null)
   const [isAudioDownloaded, setIsAudioDownloaded] = useState<Boolean>(false)
 
+  //If there's new translation, fetch audio transcript for this tranlation
   useEffect(() => {
-    if (!audio) audio = new Audio()
     if (translatedText) {
       setIsAudioDownloaded(false)
       speak(translatedText)
     }
   }, [translatedText])
 
+  //If we recieved audio transcript - make this file our current source of audio
   useEffect(() => {
+    if (!audio) audio = new Audio()
     if (audioFile) {
       let fileReader = new FileReader();
       fileReader.onload = function() {
@@ -27,33 +29,18 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
     }
   }, [audioFile])
 
-  const playAudio = () => {
-    audio.play();
-  }
-
   async function speak(text: string) {
     try {
       // Generate initial voice paramets
-      const audioResponse: any = await axios.post(`http://127.0.0.1:50011/audio_query?text=${text}&speaker=1`);
-      const audioData = await audioResponse.data;
-    
-      //Adjusting desired voice parametrs to our liking
-      audioData.volumeScale = 2.0;
-      audioData.intonationScale = 1.5;
-      audioData.prePhonemeLength = 1.0;
-      audioData.postPhonemeLength = 1.0;
+      const audioData = await textToSpeechParams(text);
     
       // Synthesize voice as a 'wav' file
-      const synthesisResponse: any = await axios.post('http://127.0.0.1:50011/synthesis?speaker=1', audioData, {
-        responseType: 'blob',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      setAudioFile(synthesisResponse.data)
+      const synthesisResponse = await textToSpeechAudio(audioData);
+
+      setAudioFile(synthesisResponse?.data)
       setIsAudioDownloaded(true)
   
-      // //Downloading recieved audio-blop
+      // //Downloading recieved audio-blop file
       // const href = window.URL.createObjectURL(synthesisResponse.data);
       // const anchorElement = document.createElement('a');
       // anchorElement.href = href;
@@ -65,6 +52,10 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  const playAudio = () => {
+    audio.play();
   }
   
   return (
