@@ -1,19 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import TranslationStyles from '@/styles/translation.module.scss'
 import { textToSpeechAudio, textToSpeechParams } from '@/api/textToSpeechAPI';
+// import Kuroshiro from "kuroshiro";
+// import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
+// const kuroshiro = new Kuroshiro();
+// KuromojiAnalyzer.min.js
 
 let audio: any;
 
 const Translation = ({translatedText, setTranslatedText}: any) => {
   const [audioFile, setAudioFile] = useState<Blob | null>(null)
   const [isAudioDownloaded, setIsAudioDownloaded] = useState<Boolean>(false)
+  const [kuroshirooo, setKuroshirooo] = useState<string>('')
 
   //If there's new translation, fetch audio transcript for this tranlation
   useEffect(() => {
-    if (translatedText) {
-      setIsAudioDownloaded(false)
-      speak(translatedText)
-    }
+    (async() => {
+      if (translatedText) {
+        // const kuroshiro = new Kuroshiro();
+        // const analyzer = new KuromojiAnalyzer();
+        // await kuroshiro.init(analyzer);
+        // const furigana = await kuroshiro.convert("感じ取れたら手を繋ごう、重なるのは人生のライン and レミリア最高！", {mode:"furigana", to:"hiragana"});
+        // console.log(furigana)
+        // setKuroshirooo(furigana)
+        setIsAudioDownloaded(false)
+        speak(translatedText)
+      }
+    })()
   }, [translatedText])
 
   //If we recieved audio transcript - make this file our current source of audio
@@ -63,6 +76,8 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
         <h1>Translation</h1>
         <p>
             {translatedText}
+            {/* {kuroshirooo} */}
+            {/* {kuroshiro.convert(translatedText, {mode:"furigana", to:"hiragana"})} */}
         </p>
 
         <div className={`${TranslationStyles.buttonsSection}`}>

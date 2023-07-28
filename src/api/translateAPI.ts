@@ -6,7 +6,7 @@ export async function translateAPI (textToTranslate: string): Promise<string> {
     {},
     {
       params: {
-        key: process.env.NEXT_PUBLIC_GOOGLE_TRANLATE_API,
+        key: process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_KEY,
         q: textToTranslate,
         // source: 'en', //Если убрать параметр 'source', то язык будет определяться автоматически
         target: 'ja', //ja (япон), uk (укр), ru (рус)
