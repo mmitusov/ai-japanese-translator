@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import TranslationStyles from '@/styles/translation.module.scss'
 import { textToSpeechAudio, textToSpeechParams } from '@/api/textToSpeechAPI';
-// import Kuroshiro from "kuroshiro";
-// import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
-// const kuroshiro = new Kuroshiro();
-// KuromojiAnalyzer.min.js
+import * as DOMPurify from 'dompurify';
+import Kuroshiro from "kuroshiro";
+import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
 
 let audio: any;
 
@@ -17,12 +16,23 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
   useEffect(() => {
     (async() => {
       if (translatedText) {
-        // const kuroshiro = new Kuroshiro();
-        // const analyzer = new KuromojiAnalyzer();
-        // await kuroshiro.init(analyzer);
-        // const furigana = await kuroshiro.convert("感じ取れたら手を繋ごう、重なるのは人生のライン and レミリア最高！", {mode:"furigana", to:"hiragana"});
-        // console.log(furigana)
-        // setKuroshirooo(furigana)
+        const kuroshiro = new Kuroshiro();
+        const analyzer = new KuromojiAnalyzer({
+          dictPath: '/dict/',
+        });
+        await kuroshiro.init(analyzer);
+        const romaji = await kuroshiro.convert(translatedText, {
+          to: 'romaji',
+          mode: 'spaced',
+          romajiSystem: 'passport',
+        });
+        const furigana = await kuroshiro.convert(translatedText, {
+          mode:"furigana", 
+          to:"hiragana"
+        });
+        const clean = DOMPurify.sanitize(furigana);
+        console.log(clean)
+        setKuroshirooo(clean)
         setIsAudioDownloaded(false)
         speak(translatedText)
       }
@@ -76,9 +86,8 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
         <h1>Translation</h1>
         <p>
             {translatedText}
-            {/* {kuroshirooo} */}
-            {/* {kuroshiro.convert(translatedText, {mode:"furigana", to:"hiragana"})} */}
         </p>
+        <p dangerouslySetInnerHTML={{ __html: kuroshirooo }} />
 
         <div className={`${TranslationStyles.buttonsSection}`}>
           <div>

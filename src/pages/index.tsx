@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const [input, setInput] = useState<string>('')
-  const [translatedText, setTranslatedText] = useState<string>('')
+  const [translatedText, setTranslatedText] = useState<string>('こんにちは、友よ')
   
   return (
     <>
