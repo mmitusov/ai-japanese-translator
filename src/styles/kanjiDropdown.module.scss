@@ -1,0 +1,16 @@
+.dropdown { //Outer border
+    border: none;
+
+    & > div { //Inner border
+        gap: 25px;
+        border: 1px solid grey;
+        border-radius: 5px;
+        min-width: 60px;
+        min-height: 40px;
+        font-size: 20px;
+
+        span {
+            margin-top: 6px;
+        }
+    }
+}

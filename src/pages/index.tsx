@@ -10,7 +10,9 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const [input, setInput] = useState<string>('')
-  const [translatedText, setTranslatedText] = useState<string>('こんにちは、友よ')
+  const [translatedText, setTranslatedText] = useState<string>('')
+  const [romaji, setRomaji] = useState<string>('')
+  const [furigana, setFurigana] = useState<string>('')
   
   return (
     <>
@@ -24,7 +26,11 @@ export default function Home() {
         <h1>Translate from ANY language to Japanese <br/> With AI!</h1>
         <Input input={input} setInput={setInput} setTranslatedText={setTranslatedText}/>
         {translatedText[0] &&
-          <Translation translatedText={translatedText} setTranslatedText={setTranslatedText}/>}
+          <Translation 
+            translatedText={translatedText} setTranslatedText={setTranslatedText}
+            romaji={romaji} setRomaji={setRomaji}
+            furigana={furigana} setFurigana={setFurigana}
+          />}
       </main>
     </>
   )

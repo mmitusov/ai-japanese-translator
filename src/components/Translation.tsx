@@ -2,22 +2,13 @@ import React, { useEffect, useState } from 'react'
 import TranslationStyles from '@/styles/translation.module.scss'
 import { textToSpeechAudio, textToSpeechParams } from '@/api/textToSpeechAPI';
 import { kanjiAnnotation } from '@/utils/kanjiAnnotation';
-import Dropdown from 'react-dropdown';
-import 'react-dropdown/style.css';
-
-const options = [
-  'Kanji', 'Furigana', 'Romaji'
-];
-const defaultOption = options[0];
-
+import KanjiDropdown from './KanjiDropdown';
 
 let audio: any;
 
-const Translation = ({translatedText, setTranslatedText}: any) => {
+const Translation = ({translatedText, setTranslatedText, romaji, setRomaji, furigana, setFurigana}: any) => {
   const [audioFile, setAudioFile] = useState<Blob | null>(null)
   const [isAudioDownloaded, setIsAudioDownloaded] = useState<Boolean>(false)
-  const [romaji, setRomaji] = useState<string>('')
-  const [furigana, setFurigana] = useState<string>('')
   const [dropdownValue, setDropdownValue] = useState<string>('Kanji')
 
   //If there's new translation, annotate kanji and fetch audio transcript for this tranlation
@@ -56,16 +47,6 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
 
       setAudioFile(synthesisResponse?.data)
       setIsAudioDownloaded(true)
-  
-      // //Downloading recieved audio-blop file
-      // const href = window.URL.createObjectURL(synthesisResponse.data);
-      // const anchorElement = document.createElement('a');
-      // anchorElement.href = href;
-      // anchorElement.download = 'AiAudio';
-      // document.body.appendChild(anchorElement);
-      // anchorElement.click();
-      // document.body.removeChild(anchorElement);
-      // window.URL.revokeObjectURL(href);
     } catch (error) {
       console.error(error)
     }
@@ -89,8 +70,8 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
             <button onClick={() => setTranslatedText('')}>Clear</button>
           </div>
 
-          <Dropdown options={options} onChange={(e) => setDropdownValue(e.value)} value={defaultOption} placeholder="Select an option" />
-          
+          <KanjiDropdown setDropdownValue={setDropdownValue}/>
+
           {
             isAudioDownloaded
               ? 
