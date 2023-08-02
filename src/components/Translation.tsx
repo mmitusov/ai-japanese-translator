@@ -1,38 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import TranslationStyles from '@/styles/translation.module.scss'
 import { textToSpeechAudio, textToSpeechParams } from '@/api/textToSpeechAPI';
-import * as DOMPurify from 'dompurify';
-import Kuroshiro from "kuroshiro";
-import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
+import { kanjiAnnotation } from '@/utils/kanjiAnnotation';
+import Dropdown from 'react-dropdown';
+import 'react-dropdown/style.css';
+
+const options = [
+  'Kanji', 'Furigana', 'Romaji'
+];
+const defaultOption = options[0];
+
 
 let audio: any;
 
 const Translation = ({translatedText, setTranslatedText}: any) => {
   const [audioFile, setAudioFile] = useState<Blob | null>(null)
   const [isAudioDownloaded, setIsAudioDownloaded] = useState<Boolean>(false)
-  const [kuroshirooo, setKuroshirooo] = useState<string>('')
+  const [romaji, setRomaji] = useState<string>('')
+  const [furigana, setFurigana] = useState<string>('')
+  const [dropdownValue, setDropdownValue] = useState<string>('Kanji')
 
-  //If there's new translation, fetch audio transcript for this tranlation
+  //If there's new translation, annotate kanji and fetch audio transcript for this tranlation
   useEffect(() => {
     (async() => {
       if (translatedText) {
-        const kuroshiro = new Kuroshiro();
-        const analyzer = new KuromojiAnalyzer({
-          dictPath: '/dict/',
-        });
-        await kuroshiro.init(analyzer);
-        const romaji = await kuroshiro.convert(translatedText, {
-          to: 'romaji',
-          mode: 'spaced',
-          romajiSystem: 'passport',
-        });
-        const furigana = await kuroshiro.convert(translatedText, {
-          mode:"furigana", 
-          to:"hiragana"
-        });
-        const clean = DOMPurify.sanitize(furigana);
-        console.log(clean)
-        setKuroshirooo(clean)
+        const {cleanRomaji, cleanFurigana} = await kanjiAnnotation(translatedText);
+        setRomaji(cleanRomaji)
+        setFurigana(cleanFurigana)
         setIsAudioDownloaded(false)
         speak(translatedText)
       }
@@ -84,16 +78,19 @@ const Translation = ({translatedText, setTranslatedText}: any) => {
   return (
     <div className={`${TranslationStyles.translationContainer}`}>
         <h1>Translation</h1>
-        <p>
-            {translatedText}
-        </p>
-        <p dangerouslySetInnerHTML={{ __html: kuroshirooo }} />
-
+        {
+          dropdownValue === 'Kanji' && <p>{translatedText}</p>
+          || dropdownValue === 'Romaji' && <p>{romaji}</p>
+          || dropdownValue === 'Furigana' &&  <p dangerouslySetInnerHTML={{ __html: furigana }} />
+        }
         <div className={`${TranslationStyles.buttonsSection}`}>
           <div>
             <button onClick={() => {navigator.clipboard.writeText(translatedText)}} className={`${TranslationStyles.buttonCopy}`}>Copy text</button>
             <button onClick={() => setTranslatedText('')}>Clear</button>
           </div>
+
+          <Dropdown options={options} onChange={(e) => setDropdownValue(e.value)} value={defaultOption} placeholder="Select an option" />
+          
           {
             isAudioDownloaded
               ? 

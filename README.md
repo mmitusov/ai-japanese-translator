@@ -4,6 +4,7 @@ npm i --save regenerator-runtime //To fix an Error [ReferenceError]: regenerator
 npm i kuroshiro - for kanji annotation
 npm i kuroshiro-analyzer-kuromoji - for kanji annotation
 npm i dompurify - XSS sanitizer for HTML, MathML and SVG when we're using 'dangerouslySetInnerHTML'
+npm i react-dropdown
 
 # Описание приложения
 Данное приложение может переводить любой текст на японский, после чего озвучить перевод или отобразить его в виде фуриганы.

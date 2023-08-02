@@ -6,18 +6,27 @@ const kuroshiro = new Kuroshiro();
 const analyzer = new KuromojiAnalyzer({
   dictPath: '/dict/',
 });
+const initializeKuroshiro = async () => {
+  await kuroshiro.init(analyzer);
+};
+initializeKuroshiro()
 
-const kanjiAnnotation = async (kanji: string) => {
-    await kuroshiro.init(analyzer);
-    const romaji = await kuroshiro.convert(kanji, {
-      to: 'romaji',
-      mode: 'spaced',
-      romajiSystem: 'passport',
-    });
-    const furigana = await kuroshiro.convert(kanji, {
-      mode:"furigana", 
-      to:"hiragana"
-    });
-    const clean = DOMPurify.sanitize(furigana);
+interface Kanji {
+  cleanRomaji: string;
+  cleanFurigana: string;
 }
 
+export const kanjiAnnotation = async (kanji: string): Promise<Kanji> => {
+  const cleanRomaji = await kuroshiro.convert(kanji, {
+    to: 'romaji',
+    mode: 'spaced',
+    romajiSystem: 'passport',
+  });
+  const furigana = await kuroshiro.convert(kanji, {
+    mode:"furigana", 
+    to:"hiragana"
+  });
+  const cleanFurigana = DOMPurify.sanitize(furigana);
+
+  return {cleanRomaji, cleanFurigana}
+}
