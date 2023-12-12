@@ -31,6 +31,8 @@ VOICEVOX, для конвертации текста в голос, сперва
 
 При полочении аудиофайла с бекенда и попытке его воспроизвести, изначально я поличил следующею ошибку: NotAllowedError: The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission. (https://arrangeactassert.com/posts/how-to-fix-the-request-is-not-allowed-by-the-user-agent-or-the-platform-in-the-current-context-possibly-because-the-user-denied-permission/). Данная ошибка возникла, так как я попытался инициализировать аудио и сразу же его проиграть сразу же внутри одной функции. После чего я получил эту ошибку так как браузер don't allow sites to autoplay audio or videos without user interaction. Поэтому после того как я разбил этот функционал на две разные части (отдельно инициализация, отдельно проигрывание) - ошибка изчезла.
 
+Пример квери: `http://127.0.0.1:50021/audio_query?text=Hello&speaker=2`
+
 ***Dealing with blob***
 If we want we can convert one Blob data type into another Blob data type (e.g. video to audio) by using following method: "const audioBlob = new Blob(audioChunks, {type: audio/mpeg});".
 
