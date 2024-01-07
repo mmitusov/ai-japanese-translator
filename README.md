@@ -68,3 +68,7 @@ Ruby characters: Ruby characters or rubi (ルビ) is another term used to descri
 При желании, дополнительно можно подключить AI генерацию картинок для сайта. Официальные доки - https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API.
 
 AUTOMATIC1111 имеет встроенную поддержку API. Однако из коробки данные API отключены. Чтобы их активировать необходимо настроить конфигурационные файлы AUTOMATIC1111. А именно "webui-user.sh" (for Linux, MacOS) или "webui-user.bat" (for Windows). В моем случае я воспользуюсь "webui-user.sh". В конфиге необходимо найти и раскоментировать "export COMMANDLINE_ARGS". После чего задать ему параметр - `export COMMANDLINE_ARGS="--api"`. Однако если машина не имеет NVIDIA GPUs CUDA cores, то необходимо дополнительно указать параметры которые будут это учитывать и тогда проводить вычисления на CPU, а не на GPU - `export COMMANDLINE_ARGS="--api --skip-torch-cuda-test --lowvram --precision full --no-half"`. После этого, если запустить AUTOMATIC1111 - "./webui.sh", то по адресу "http://127.0.0.1:7860/docs", будут доступны новые API. Такие как, например, "/sdapi/v1/txt2img". После чего мы можем начать работать с нашими уже доступными API-шками.
+
+***How to implement Auto-Growing Inputs & Textareas***
+https://css-tricks.com/auto-growing-inputs-textareas/
+https://stephanwagner.me/auto-resizing-textarea-with-vanilla-javascript
